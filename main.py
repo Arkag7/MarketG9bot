@@ -60,8 +60,7 @@ async def analyze(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.edit_message_text(
             chat_id=update.effective_chat.id,
             message_id=status_msg.message_id,
-            text=report_text,
-            parse_mode="Markdown"
+            text=report_text
         )
     except Exception as e:
         await context.bot.edit_message_text(
