@@ -49,7 +49,7 @@ async def analyze(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         response = gemini_client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-3.6-flash",
             contents=prompt,
         )
         await context.bot.edit_message_text(
