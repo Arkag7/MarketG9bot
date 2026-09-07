@@ -90,3 +90,20 @@ async def telegram_webhook(request: Request):
 @app.get("/")
 async def health():
     return {"status": "ok", "service": "MarketG9 Bot"}
+
+@app.get("/generate")
+async def generate_web(query: str):
+    prompt = f"""
+    You are a B2B Market Intelligence analyst. Conduct a structured assessment for: {query}.
+    
+    Provide:
+    1. Industry Trends & Macro Drivers
+    2. Distribution Channels & Territory Conflicts
+    3. Key Risks & Emerging Opportunities
+    4. Actionable Recommendations
+    """
+    response = gemini_client.models.generate_content(
+        model="gemini-3.5-flash",
+        contents=prompt,
+    )
+    return {"query": query, "report": response.text}
