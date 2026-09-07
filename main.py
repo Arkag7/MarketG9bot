@@ -11,7 +11,7 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
 
-# Initialize the Gemini client using the modern google-genai SDK
+# Initialize Gemini client
 gemini_client = genai.Client(api_key=GEMINI_API_KEY)
 
 app = FastAPI()
@@ -49,7 +49,7 @@ async def analyze(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         response = gemini_client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.0-flash",
             contents=prompt,
         )
         await context.bot.edit_message_text(
