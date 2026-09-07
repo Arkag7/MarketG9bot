@@ -44,7 +44,7 @@ async def analyze(update: Update, context: ContextTypes.DEFAULT_TYPE):
     3. **Key Risks & Emerging Opportunities**
     4. **Actionable Recommendations**
     
-    Keep output structured, concise, and formatted in clean Markdown.
+    STRICT RULE: Keep the entire response strictly under 3,000 characters so it fits in a single Telegram message.
     """
 
     try:
@@ -52,10 +52,15 @@ async def analyze(update: Update, context: ContextTypes.DEFAULT_TYPE):
             model="gemini-3.5-flash",
             contents=prompt,
         )
+       # Trim text to 4000 characters so Telegram never rejects it
+        report_text = response.text
+        if len(report_text) > 4000:
+            report_text = report_text[:3900] + "\n\n*(Report trimmed due to Telegram length limit)*"
+
         await context.bot.edit_message_text(
             chat_id=update.effective_chat.id,
             message_id=status_msg.message_id,
-            text=response.text,
+            text=report_text,
             parse_mode="Markdown"
         )
     except Exception as e:
