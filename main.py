@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI, Request, Response
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
-import google.generativeai as genai
+from google import genai
 
 logging.basicConfig(level=logging.INFO)
 
@@ -11,8 +11,8 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
 
-genai.configure(api_key=GEMINI_API_KEY)
-gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+# Initialize the Gemini client using the modern google-genai SDK
+gemini_client = genai.Client(api_key=GEMINI_API_KEY)
 
 app = FastAPI()
 ptb_app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
@@ -20,7 +20,10 @@ ptb_app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_text = (
         "🚀 *MarketG9 Market Intelligence Bot*\n\n"
-        "Send `/analyze <industry or company>` to generate strategic market briefs."
+        "Send `/analyze <industry or company>` to generate strategic market briefs covering:\n"
+        "• Industry Trends & Macro Drivers\n"
+        "• Distribution Channels & Territory Conflicts\n"
+        "• Key Risks & Strategic Opportunities"
     )
     await update.message.reply_text(welcome_text, parse_mode="Markdown")
 
@@ -45,7 +48,10 @@ async def analyze(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
 
     try:
-        response = gemini_model.generate_content(prompt)
+        response = gemini_client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
         await context.bot.edit_message_text(
             chat_id=update.effective_chat.id,
             message_id=status_msg.message_id,
@@ -56,7 +62,7 @@ async def analyze(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.edit_message_text(
             chat_id=update.effective_chat.id,
             message_id=status_msg.message_id,
-            text=f"❌ Error generating report: {str(e)}"
+            text=f"❌ Error generating intelligence report: {str(e)}"
         )
 
 ptb_app.add_handler(CommandHandler("start", start))
